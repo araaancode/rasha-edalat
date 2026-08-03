@@ -1,0 +1,120 @@
+/* frontend/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* تعریف فونت ایران یکتا از مسیر محلی */
+@font-face {
+  font-family: 'IranYekan';
+  src: url('/fonts/Yekan.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* تنظیمات پایه */
+@layer base {
+  html {
+    direction: rtl;
+    font-family: 'IranYekan', 'Vazirmatn', 'IranSans', sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+/* رنگ‌های سفارشی */
+:root {
+  --primary-dark: #1a2940;    /* سورمه‌ای تیره */
+  --primary-medium: #2c3e6b;  /* سورمه‌ای متوسط */
+  --primary-light: #4a6fa5;   /* سورمه‌ای روشن */
+  --gold: #d4a843;            /* طلایی */
+  --gold-light: #f0d48a;      /* طلایی روشن */
+  --gold-dark: #b8922e;       /* طلایی تیره */
+}
+
+/* کامپوننت‌های سفارشی */
+@layer components {
+  /* دکمه اصلی - سورمه‌ای */
+  .btn-primary {
+    @apply bg-[#1a2940] text-white px-4 py-2 rounded-lg hover:bg-[#2c3e6b] transition-all duration-300 shadow-md hover:shadow-lg;
+  }
+  
+  /* دکمه طلایی */
+  .btn-gold {
+    @apply bg-[#d4a843] text-white px-4 py-2 rounded-lg hover:bg-[#b8922e] transition-all duration-300 shadow-md hover:shadow-lg;
+  }
+  
+  /* دکمه outline */
+  .btn-outline {
+    @apply border-2 border-[#d4a843] text-[#1a2940] px-4 py-2 rounded-lg hover:bg-[#d4a843] hover:text-white transition-all duration-300;
+  }
+  
+  /* کارت */
+  .card {
+    @apply bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300;
+  }
+  
+  /* کارت با حاشیه طلایی */
+  .card-gold {
+    @apply bg-white rounded-xl shadow-md p-6 border-2 border-[#d4a843] hover:shadow-xl transition-shadow duration-300;
+  }
+  
+  /* ورودی */
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4a843] focus:border-[#d4a843] transition-all duration-300;
+  }
+  
+  /* هدر */
+  .header-title {
+    @apply text-2xl font-bold text-[#1a2940];
+  }
+  
+  .header-subtitle {
+    @apply text-gray-500;
+  }
+  
+  /* لینک طلایی */
+  .link-gold {
+    @apply text-[#d4a843] hover:text-[#b8922e] transition-colors duration-300;
+  }
+  
+  /* بج */
+  .badge-gold {
+    @apply bg-[#d4a843] text-white px-2 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .badge-dark {
+    @apply bg-[#1a2940] text-white px-2 py-1 rounded-full text-xs font-medium;
+  }
+}
+
+/* انیمیشن‌ها */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 168, 67, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(212, 168, 67, 0);
+  }
+}
+
+.pulse-gold {
+  animation: pulse-gold 2s infinite;
+}

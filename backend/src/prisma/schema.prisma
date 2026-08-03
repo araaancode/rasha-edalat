@@ -1,0 +1,202 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  LAWYER
+  ADMIN
+}
+
+enum LawyerSpecialization {
+  FAMILY
+  PROPERTY
+  LABOR
+  COMMERCIAL
+  CRIMINAL
+  INTERNATIONAL
+}
+
+enum ConversationType {
+  AI
+  HUMAN
+}
+
+enum ConversationStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum MessageSender {
+  USER
+  AI
+  LAWYER
+  SYSTEM
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELED
+  DONE
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model User {
+  id                  String              @id @default(uuid())
+  email               String              @unique
+  phone               String              @unique
+  password            String
+  fullName            String
+  nationalCode        String?
+  role                UserRole            @default(USER)
+  isVerified          Boolean             @default(false)
+  verifyToken         String?
+  resetPasswordToken  String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  lawyerProfile       LawyerProfile?
+  conversations       Conversation[]
+  appointments        Appointment[]
+  documents           Document[]
+  payments            Payment[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model LawyerProfile {
+  id                  String                  @id @default(uuid())
+  userId              String                  @unique
+  specialization      LawyerSpecialization
+  barNumber           String                  @unique
+  bio                 String?                 @db.Text
+  hourlyRate          Int                     @default(500000)
+  averageRating       Float?                  @default(0)
+  isApprovedByAdmin   Boolean                 @default(false)
+  totalConsultations  Int                     @default(0)
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+
+  user                User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments        Appointment[]
+  conversations       Conversation[]
+
+  @@index([specialization])
+  @@index([isApprovedByAdmin])
+}
+
+model Conversation {
+  id                  String              @id @default(uuid())
+  userId              String
+  lawyerId            String?
+  type                ConversationType
+  status              ConversationStatus  @default(ACTIVE)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lawyer              LawyerProfile?      @relation(fields: [lawyerId], references: [id])
+  messages            Message[]
+  documents           Document[]
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Message {
+  id                  String              @id @default(uuid())
+  conversationId      String
+  sender              MessageSender
+  content             String?             @db.Text
+  fileUrl             String?
+  fileType            String?
+  isRead              Boolean             @default(false)
+  createdAt           DateTime            @default(now())
+
+  conversation        Conversation        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt(sort: Desc)])
+}
+
+model Document {
+  id                  String              @id @default(uuid())
+  userId              String
+  conversationId      String?
+  appointmentId       String?
+  fileName            String
+  filePath            String
+  fileSize            Int
+  mimeType            String
+  uploadedAt          DateTime            @default(now())
+
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation        Conversation?       @relation(fields: [conversationId], references: [id])
+  appointment         Appointment?        @relation(fields: [appointmentId], references: [id])
+
+  @@index([userId])
+}
+
+model Appointment {
+  id                  String              @id @default(uuid())
+  userId              String
+  lawyerId            String
+  date                DateTime
+  startTime           String
+  endTime             String
+  status              AppointmentStatus   @default(PENDING)
+  meetingLink         String?
+  // ملاحظه: paymentId از اینجا حذف شد چون مالک رابطه Payment است
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lawyer              LawyerProfile       @relation(fields: [lawyerId], references: [id])
+  payment             Payment?            // رابطه یک‌به‌یک بدون fields و references
+  documents           Document[]
+
+  @@unique([lawyerId, date, startTime])
+  @@index([lawyerId, status])
+  @@index([userId, status])
+}
+
+model Payment {
+  id                  String              @id @default(uuid())
+  userId              String
+  appointmentId       String?             @unique // این فیلد تعیین‌کننده مالک رابطه است
+  amount              Int
+  authority           String              @unique
+  refId               String?
+  status              PaymentStatus       @default(PENDING)
+  paymentDate         DateTime?
+  createdAt           DateTime            @default(now())
+
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointment         Appointment?        @relation(fields: [appointmentId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SystemSetting {
+  id                  String              @id @default(uuid())
+  key                 String              @unique
+  value               String              @db.Text
+  description         String?
+  updatedAt           DateTime            @updatedAt
+
+  @@index([key])
+}
