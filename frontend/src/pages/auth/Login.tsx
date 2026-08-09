@@ -1,4 +1,4 @@
-// frontend/src/pages/Login.tsx
+// frontend/src/pages/auth/Login.tsx
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,7 +15,6 @@ import {
   IoEyeOutline, 
   IoEyeOffOutline,
   IoWarningOutline,
-  IoLogInOutline,
   IoReloadOutline
 } from 'react-icons/io5';
 import { MdOutlineLogin } from 'react-icons/md';
@@ -54,18 +53,14 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F5F3F0] to-[#EAE7E2] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative Background Elements */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-[#1A4B6D]/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#4A8AB5]/5 rounded-full blur-3xl"></div>
       
-      {/* Decorative Floating Elements */}
       <div className="absolute top-20 right-20 w-16 h-16 bg-[#1A4B6D]/10 rounded-full blur-2xl animate-float"></div>
       <div className="absolute bottom-20 left-20 w-20 h-20 bg-[#4A8AB5]/10 rounded-full blur-2xl animate-float-delay"></div>
 
       <div className="max-w-md w-full space-y-8 relative z-10">
-        {/* Header */}
         <div className="text-center">
-         
           <h2 className="text-3xl font-bold text-[#0A1A2B]">
             ورود به <span className="text-[#1A4B6D]">راشا عدالت</span>
           </h2>
@@ -77,10 +72,8 @@ export const Login: React.FC = () => {
           </p>
         </div>
 
-        {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 space-y-5 border border-gray-100/50">
-            {/* Identifier (Email or Phone) */}
             <div>
               <label className="block text-sm font-semibold text-[#0A1A2B] mb-1.5">
                 <IoPersonOutline className="inline ml-2 text-[#1A4B6D] text-base" />
@@ -107,7 +100,6 @@ export const Login: React.FC = () => {
               )}
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-semibold text-[#0A1A2B] mb-1.5">
                 <IoLockClosedOutline className="inline ml-2 text-[#1A4B6D] text-base" />
@@ -142,7 +134,6 @@ export const Login: React.FC = () => {
               )}
             </div>
 
-            {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between pt-2">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input
@@ -165,7 +156,6 @@ export const Login: React.FC = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
@@ -187,7 +177,6 @@ export const Login: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
           </button>
 
-          {/* Register Link (Mobile) */}
           <div className="text-center text-sm text-[#4A5A6E] md:hidden">
             حساب کاربری ندارید؟{' '}
             <Link to="/register" className="font-semibold text-[#1A4B6D] hover:text-[#2A6A8D] transition-all duration-300">

@@ -6,7 +6,6 @@ import type { AppDispatch, RootState } from '../store';
 import { getMessages, sendMessage, addMessage, setCurrentConversation, createConversation, resetChat } from '../store/slices/chatSlice';
 import toast from 'react-hot-toast';
 import { 
-  MdArrowForward, 
   MdArrowBack, 
   MdHome, 
   MdAccessTime, 
@@ -16,21 +15,18 @@ import {
 import { RiRobot2Line } from 'react-icons/ri';
 import { TbUser } from 'react-icons/tb';
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
-import { LuPaperclip } from 'react-icons/lu';
 
 export const Chat: React.FC = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { messages, isLoading } = useSelector((state: RootState) => state.chat);
-  const { user } = useSelector((state: RootState) => state.auth);
   
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // اگر conversationId وجود نداشته باشد، یک مکالمه جدید ایجاد کن
   useEffect(() => {
     if (!conversationId || conversationId === 'new') {
       dispatch(createConversation({ type: 'AI' }))
@@ -53,12 +49,10 @@ export const Chat: React.FC = () => {
     };
   }, [conversationId, dispatch, navigate]);
 
-  // اسکرول به پایین
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // فوکوس روی input
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -71,7 +65,6 @@ export const Chat: React.FC = () => {
     setInput('');
     setIsSending(true);
 
-    // اضافه کردن پیام کاربر به صورت محلی
     const userMessage = {
       id: Date.now().toString(),
       sender: 'USER' as const,
@@ -81,14 +74,10 @@ export const Chat: React.FC = () => {
     dispatch(addMessage(userMessage));
 
     try {
-      const result = await dispatch(sendMessage({ 
+      await dispatch(sendMessage({ 
         conversationId, 
         content 
       })).unwrap();
-
-      if (result.message) {
-        // پیام AI قبلاً در slice اضافه شده است
-      }
     } catch (error: any) {
       toast.error(error?.message || 'ارسال پیام ناموفق بود');
     } finally {
@@ -105,7 +94,6 @@ export const Chat: React.FC = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-5rem)] bg-gradient-to-br from-[#F8F9FA] to-[#EAE7E2] rounded-2xl shadow-2xl overflow-hidden border border-gray-100/50">
-      {/* Header */}
       <div className="bg-gradient-to-r from-[#0A1A2B] to-[#1A4B6D] px-6 py-4 flex justify-between items-center shadow-lg">
         <div className="flex items-center gap-3">
           <button
@@ -133,7 +121,6 @@ export const Chat: React.FC = () => {
         </button>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         {isLoading ? (
           <div className="flex justify-center items-center h-full">
@@ -167,7 +154,6 @@ export const Chat: React.FC = () => {
           </div>
         ) : (
           <>
-            {/* Date Divider */}
             <div className="flex items-center gap-3 my-2">
               <div className="flex-1 h-px bg-gray-200"></div>
               <span className="text-xs text-gray-400 px-3 py-1 bg-white rounded-full shadow-sm">
@@ -184,7 +170,6 @@ export const Chat: React.FC = () => {
                 <div className={`flex items-start gap-2 max-w-[85%] ${
                   msg.sender === 'USER' ? 'flex-row-reverse' : ''
                 }`}>
-                  {/* Avatar */}
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
                     msg.sender === 'USER'
                       ? 'bg-gradient-to-br from-[#1A4B6D] to-[#2A6A8D]'
@@ -197,7 +182,6 @@ export const Chat: React.FC = () => {
                     )}
                   </div>
                   
-                  {/* Message */}
                   <div
                     className={`px-4 py-3 rounded-2xl shadow-md ${
                       msg.sender === 'USER'
@@ -224,7 +208,6 @@ export const Chat: React.FC = () => {
           </>
         )}
         
-        {/* Typing Indicator */}
         {isSending && (
           <div className="flex justify-start animate-fade-in-up">
             <div className="flex items-start gap-2 max-w-[85%]">
@@ -248,7 +231,6 @@ export const Chat: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4 shadow-lg">
         <div className="flex gap-3 max-w-4xl mx-auto">
           <div className="relative flex-1">
@@ -299,12 +281,19 @@ export const Chat: React.FC = () => {
         .animate-float {
           animation: float 3s ease-in-out infinite;
         }
-        .animate-fade-in-up {
-          animation: fadeInUp 0.3s ease-out forwards;
-        }
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.3s ease-out forwards;
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        .animate-bounce {
+          animation: bounce 1s ease-in-out infinite;
         }
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;

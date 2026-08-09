@@ -7,59 +7,29 @@ import { z } from 'zod';
 import type { AppDispatch, RootState } from '../store';
 import { updateProfile } from '../store/slices/authSlice';
 import toast from 'react-hot-toast';
-import { 
-  FaUser, 
-  FaEnvelope, 
-  FaPhone, 
-  FaUserTag, 
-  FaEdit, 
-  FaSave, 
-  FaTimes,
-  FaCheckCircle,
-  FaShieldAlt,
-  FaClock,
-  FaGavel,
-  FaCalendarAlt,
-  FaIdCard,
-  FaUserCircle,
-  FaSignOutAlt,
-  FaCog,
-  FaBell,
-  FaLock,
-  FaHistory,
-  FaQuestionCircle
-} from 'react-icons/fa';
-import { MdVerified, MdSecurity } from 'react-icons/md';
+import { MdVerified } from 'react-icons/md';
 import { GiScales } from 'react-icons/gi';
 import {
   PiUserBold,
   PiEnvelopeBold,
   PiPhoneBold,
-  PiTagBold,
   PiPencilBold,
   PiFloppyDiskBold,
   PiXBold,
-  PiCheckCircleBold,
-  PiShieldCheckBold,
-  PiClockBold,
-  PiGavelBold,
-  PiCalendarBold,
+  // PiGavelBold, // حذف - استفاده نشده
+  // PiCalendarBold, // حذف - استفاده نشده
   PiIdentificationCardBold,
   PiUserCircleBold,
-  PiChatCircleBold,
-  PiMedalBold,
+  // PiMedalBold, // حذف - استفاده نشده
   PiShieldBold,
-  PiLockKeyBold,
-  PiKeyBold,
   PiArrowRightBold,
   PiSignOutBold,
   PiGearBold,
   PiBellBold,
   PiClockCounterClockwiseBold,
   PiQuestionBold,
-  PiUserListBold
 } from 'react-icons/pi';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const profileSchema = z.object({
   fullName: z.string().min(3, 'نام و نام خانوادگی حداقل ۳ کاراکتر است'),
@@ -132,7 +102,6 @@ export const Profile: React.FC = () => {
   };
 
   const handleLogout = () => {
-    // dispatch(logout());
     toast.success('با موفقیت خارج شدید');
     navigate('/login');
   };
@@ -144,13 +113,6 @@ export const Profile: React.FC = () => {
     { id: 'history', label: 'تاریخچه', icon: PiClockCounterClockwiseBold },
     { id: 'security', label: 'امنیت', icon: PiShieldBold },
     { id: 'help', label: 'راهنما', icon: PiQuestionBold },
-  ];
-
-  const stats = [
-    { label: 'مشاوره‌ها', value: '۱۲', icon: PiGavelBold, color: 'from-[#1A4B6D] to-[#2A6A8D]' },
-    { label: 'امتیاز', value: '۴.۸', icon: PiMedalBold, color: 'from-[#0A1A2B] to-[#1A4B6D]' },
-    { label: 'عضو از', value: '۱۴۰۲', icon: PiCalendarBold, color: 'from-[#2A6A8D] to-[#4A8AB5]' },
-    { label: 'وضعیت', value: 'فعال', icon: PiCheckCircleBold, color: 'from-[#1A4B6D] to-[#2A6A8D]' },
   ];
 
   if (isLoading) {
@@ -168,10 +130,8 @@ export const Profile: React.FC = () => {
 
   return (
     <div className="flex gap-6 animate-fade-in">
-      {/* Sidebar - Right Side */}
       <div className="w-72 flex-shrink-0">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100/50 overflow-hidden sticky top-6">
-          {/* User Card */}
           <div className="p-6 bg-gradient-to-br from-[#0A1A2B] to-[#1A4B6D] text-center">
             <div className="relative inline-block">
               <div className="absolute inset-0 bg-[#4A8AB5] blur-xl opacity-30 rounded-full"></div>
@@ -199,7 +159,6 @@ export const Profile: React.FC = () => {
             </div>
           </div>
 
-          {/* Sidebar Navigation */}
           <nav className="p-3">
             {sidebarItems.map((item) => (
               <button
@@ -221,10 +180,8 @@ export const Profile: React.FC = () => {
               </button>
             ))}
             
-            {/* Divider */}
             <div className="my-3 border-t border-gray-100"></div>
             
-            {/* Logout */}
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-right text-red-600 hover:bg-red-50"
@@ -236,10 +193,7 @@ export const Profile: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 space-y-6">
-     
-        {/* Profile Form */}
         <div className="bg-white rounded-2xl shadow-md border border-gray-100/50 overflow-hidden">
           <div className="p-6 md:p-8">
             <div className="flex items-center justify-between mb-6">
@@ -265,7 +219,6 @@ export const Profile: React.FC = () => {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              {/* Full Name */}
               <div>
                 <label className="block text-sm font-semibold text-[#0A1A2B] mb-1.5">
                   <PiUserBold className="inline ml-2 text-[#1A4B6D]" />
@@ -287,7 +240,6 @@ export const Profile: React.FC = () => {
                 )}
               </div>
 
-              {/* Email */}
               <div>
                 <label className="block text-sm font-semibold text-[#0A1A2B] mb-1.5">
                   <PiEnvelopeBold className="inline ml-2 text-[#1A4B6D]" />
@@ -309,7 +261,6 @@ export const Profile: React.FC = () => {
                 )}
               </div>
 
-              {/* Phone */}
               <div>
                 <label className="block text-sm font-semibold text-[#0A1A2B] mb-1.5">
                   <PiPhoneBold className="inline ml-2 text-[#1A4B6D]" />
@@ -331,11 +282,10 @@ export const Profile: React.FC = () => {
                 )}
               </div>
 
-              {/* Specialty (only for lawyers) */}
               {user?.role === 'LAWYER' && (
                 <div>
                   <label className="block text-sm font-semibold text-[#0A1A2B] mb-1.5">
-                    <PiTagBold className="inline ml-2 text-[#1A4B6D]" />
+                    <PiUserCircleBold className="inline ml-2 text-[#1A4B6D]" />
                     تخصص
                   </label>
                   <input
@@ -350,7 +300,6 @@ export const Profile: React.FC = () => {
                 </div>
               )}
 
-              {/* Bio */}
               <div>
                 <label className="block text-sm font-semibold text-[#0A1A2B] mb-1.5">
                   <PiUserCircleBold className="inline ml-2 text-[#1A4B6D]" />
@@ -373,7 +322,6 @@ export const Profile: React.FC = () => {
                 )}
               </div>
 
-              {/* Action Buttons */}
               {isEditing && (
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
                   <button
@@ -406,8 +354,6 @@ export const Profile: React.FC = () => {
             </form>
           </div>
         </div>
-
-       
       </div>
 
       <style>{`

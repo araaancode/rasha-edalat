@@ -1,3 +1,4 @@
+// backend/prisma/seed.ts
 import { PrismaClient, UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -6,7 +7,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // Create admin user
+  // 1. Create admin user
   const adminPassword = await bcrypt.hash('Admin123!', 10);
   const admin = await prisma.user.upsert({
     where: { email: 'admin@rasha.com' },
@@ -17,13 +18,12 @@ async function main() {
       password: adminPassword,
       fullName: 'مدیر سیستم',
       role: UserRole.ADMIN,
-      isVerified: true,
+      // isVerified به صورت پیش‌فرض true است (نیازی به ذکر نیست)
     },
   });
-
   console.log(`✅ Admin created: ${admin.email}`);
 
-  // Create sample lawyer
+  // 2. Create sample lawyer
   const lawyerPassword = await bcrypt.hash('Lawyer123!', 10);
   const lawyer = await prisma.user.upsert({
     where: { email: 'lawyer@rasha.com' },
@@ -35,7 +35,7 @@ async function main() {
       fullName: 'وکیل نمونه',
       nationalCode: '1234567890',
       role: UserRole.LAWYER,
-      isVerified: true,
+      // isVerified به صورت پیش‌فرض true است
       lawyerProfile: {
         create: {
           specialization: 'FAMILY',
@@ -47,10 +47,9 @@ async function main() {
       },
     },
   });
-
   console.log(`✅ Lawyer created: ${lawyer.email}`);
 
-  // Create sample user
+  // 3. Create sample user
   const userPassword = await bcrypt.hash('User123!', 10);
   const user = await prisma.user.upsert({
     where: { email: 'user@rasha.com' },
@@ -60,13 +59,12 @@ async function main() {
       phone: '09123456787',
       password: userPassword,
       fullName: 'کاربر نمونه',
-      isVerified: true,
+      // isVerified به صورت پیش‌فرض true است
     },
   });
-
   console.log(`✅ User created: ${user.email}`);
 
-  // Create system settings
+  // 4. Create system settings
   const settings = [
     {
       key: 'AI_SYSTEM_PROMPT',
@@ -92,7 +90,6 @@ async function main() {
       create: setting,
     });
   }
-
   console.log('✅ System settings created');
 
   console.log('🎉 Database seeded successfully!');

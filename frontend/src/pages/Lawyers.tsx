@@ -1,54 +1,25 @@
 // frontend/src/pages/Lawyers.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '../store';
 import { 
-  FaSearch, 
-  FaUserTie, 
   FaStar, 
-  FaStarHalfAlt, 
-  FaRegStar,
-  FaPhone,
-  FaEnvelope,
-  FaMapMarkerAlt,
-  FaCheckCircle,
-  FaClock,
-  FaGavel,
-  FaGraduationCap,
-  FaFilter,
-  FaTimes,
-  FaWhatsapp,
-  FaTelegram,
-  FaShieldAlt,
-  FaAward,
-  FaUsers,
-  FaCalendarCheck,
-  FaComment
+  // FaStarHalfAlt, // حذف - استفاده نشده
+  // FaRegStar, // حذف - استفاده نشده
 } from 'react-icons/fa';
-import { MdVerified, MdSecurity, MdOutlineVerified } from 'react-icons/md';
-import { GiScales, GiJusticeStar } from 'react-icons/gi';
+import { MdVerified } from 'react-icons/md';
 import { 
   PiUserCircleBold,
-  PiUsersBold,
   PiChatCircleBold,
   PiPhoneBold,
   PiEnvelopeBold,
   PiMapPinBold,
-  PiStarBold,
   PiGavelBold,
   PiGraduationCapBold,
   PiClockBold,
-  PiCheckCircleBold,
-  PiShieldCheckBold,
   PiMedalBold,
-  PiCalendarBold,
-  PiArrowRightBold,
   PiMagnifyingGlassBold,
   PiFunnelBold,
   PiXCircleBold,
-  PiHandshakeBold,
-  // PiScaleBold
 } from 'react-icons/pi';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import toast from 'react-hot-toast';
@@ -73,17 +44,14 @@ interface Lawyer {
 }
 
 export const Lawyers: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('rating');
-  const [hoveredLawyer, setHoveredLawyer] = useState<string | null>(null);
 
   // Sample lawyers data با اطلاعات بیشتر
-  const [lawyers, setLawyers] = useState<Lawyer[]>([
+  const lawyers: Lawyer[] = [
     {
       id: '1',
       fullName: 'دکتر علی محمدی',
@@ -192,7 +160,7 @@ export const Lawyers: React.FC = () => {
       casesWon: 56,
       responseTime: 'کمتر از ۲ ساعت'
     },
-  ]);
+  ];
 
   const specialties = [
     'همه',
@@ -227,24 +195,6 @@ export const Lawyers: React.FC = () => {
       return 0;
     });
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={i} className="text-yellow-400" />);
-    }
-    if (hasHalfStar) {
-      stars.push(<FaStarHalfAlt key="half" className="text-yellow-400" />);
-    }
-    const remainingStars = 5 - stars.length;
-    for (let i = 0; i < remainingStars; i++) {
-      stars.push(<FaRegStar key={`empty-${i}`} className="text-gray-300" />);
-    }
-    return stars;
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -255,9 +205,6 @@ export const Lawyers: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header جدید با استفاده از آیکون‌های Pi */}
-     
-
       {/* Search and Filters */}
       <div className="bg-white rounded-2xl p-4 md:p-6 shadow-md border border-gray-100/50">
         <div className="flex flex-col md:flex-row gap-4">
@@ -342,8 +289,6 @@ export const Lawyers: React.FC = () => {
           <div
             key={lawyer.id}
             className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-100/50 hover:border-[#1A4B6D]/20 group overflow-hidden"
-            onMouseEnter={() => setHoveredLawyer(lawyer.id)}
-            onMouseLeave={() => setHoveredLawyer(null)}
           >
             <div className="p-6">
               <div className="flex items-start gap-4">

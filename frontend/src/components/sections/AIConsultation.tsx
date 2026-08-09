@@ -3,22 +3,14 @@ import React from 'react';
 import { SectionTitle } from '../common/SectionTitle';
 import { Button } from '../common/Button';
 import { 
-  MdSmartToy,
   MdAccessTime,
-  MdSecurity,
   MdGavel,
-  MdSchool,
   MdInfoOutline,
   MdArrowBack,
-  MdBalance,
-  MdWorkspacePremium
 } from 'react-icons/md';
-// import { GrUserGraduate } from 'react-icons/gr';
-import { HiAcademicCap } from 'react-icons/hi';
-import { GiJusticeStar } from 'react-icons/gi';
 import { RiRobot2Line, RiShieldCheckLine } from 'react-icons/ri';
+import { GiJusticeStar } from 'react-icons/gi';
 import { TbScale } from 'react-icons/tb';
-import { LuScale } from 'react-icons/lu';
 
 export const AIConsultation: React.FC = () => {
   const features = [
@@ -30,7 +22,6 @@ export const AIConsultation: React.FC = () => {
 
   return (
     <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-[#F8F9FA] relative overflow-hidden" id="ai-section">
-      {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#1A4B6D]/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#4A8AB5]/5 rounded-full blur-3xl"></div>
       
@@ -42,15 +33,12 @@ export const AIConsultation: React.FC = () => {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Content - Left Side */}
           <div className="order-2 lg:order-1" data-aos="fade-up">
             <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100/50 hover:border-[#1A4B6D]/20 relative overflow-hidden group">
-              {/* Glow Effect */}
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#1A4B6D]/5 rounded-full blur-2xl group-hover:bg-[#1A4B6D]/10 transition-all duration-500"></div>
               <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#4A8AB5]/5 rounded-full blur-2xl group-hover:bg-[#4A8AB5]/10 transition-all duration-500"></div>
               
               <div className="relative z-10">
-                {/* Header with Icon */}
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transform transition-all duration-300">
                     <RiRobot2Line className="text-2xl" />
@@ -67,7 +55,6 @@ export const AIConsultation: React.FC = () => {
                   از هوش مصنوعی پیشرفته ما برای دریافت مشاوره اولیه در مورد مسائل حقوقی خود استفاده کنید. پاسخ‌های فوری و دقیق مبتنی بر قوانین روز ایران.
                 </p>
                 
-                {/* Features Grid - Improved */}
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                   {features.map((feature, index) => {
                     const Icon = feature.icon;
@@ -85,7 +72,6 @@ export const AIConsultation: React.FC = () => {
                   })}
                 </ul>
 
-                {/* Note - Improved */}
                 <div className="bg-gradient-to-r from-[#EAE7E2] to-[#F5F3F0] p-4 rounded-xl flex items-start gap-3 text-sm text-[#4A5A6E] border-r-3 border-[#1A4B6D] shadow-sm">
                   <div className="w-8 h-8 bg-[#1A4B6D]/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <MdInfoOutline className="text-[#1A4B6D] text-lg" />
@@ -93,7 +79,6 @@ export const AIConsultation: React.FC = () => {
                   <span className="leading-relaxed">این مشاوره مقدماتی است و جایگزین مشاوره حضوری با وکیل نمی‌شود.</span>
                 </div>
 
-                {/* Button - Improved */}
                 <Button 
                   variant="primary" 
                   size="lg"
@@ -109,7 +94,6 @@ export const AIConsultation: React.FC = () => {
             </div>
           </div>
 
-          {/* Images - Right Side */}
           <div className="order-1 lg:order-2 space-y-4" data-aos="fade-up" data-aos-delay="100">
             <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:translate-y-[-6px] transition-all duration-500 group">
               <img 

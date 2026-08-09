@@ -62,7 +62,7 @@ model User {
   fullName            String
   nationalCode        String?
   role                UserRole            @default(USER)
-  isVerified          Boolean             @default(false)
+  isVerified          Boolean             @default(true)  // ✅ تغییر به true
   verifyToken         String?
   resetPasswordToken  String?
   createdAt           DateTime            @default(now())
@@ -159,7 +159,6 @@ model Appointment {
   endTime             String
   status              AppointmentStatus   @default(PENDING)
   meetingLink         String?
-  // ملاحظه: paymentId از اینجا حذف شد چون مالک رابطه Payment است
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
 
@@ -176,7 +175,7 @@ model Appointment {
 model Payment {
   id                  String              @id @default(uuid())
   userId              String
-  appointmentId       String?             @unique // این فیلد تعیین‌کننده مالک رابطه است
+  appointmentId       String?             @unique
   amount              Int
   authority           String              @unique
   refId               String?

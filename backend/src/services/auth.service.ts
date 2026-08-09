@@ -232,7 +232,7 @@
 
 // export const authService = new AuthService();.
 
-// backend/src/services/auth.service.ts
+// src/services/auth.service.ts
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { prisma } from '../config/database';
@@ -266,10 +266,10 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    // Generate verification token
+    // Generate verification token (اختیاری - برای ایمیل)
     const verifyToken = crypto.randomBytes(32).toString('hex');
 
-    // Create user
+    // Create user - isVerified به صورت خودکار true است (پیش‌فرض در schema)
     const user = await userRepository.create({
       email: data.email,
       phone: data.phone,
@@ -280,7 +280,7 @@ export class AuthService {
       verifyToken,
     });
 
-    // If role is lawyer, create lawyer profile
+    // اگر role وکیل باشد، پروفایل وکیل ایجاد شود
     if (data.role === 'LAWYER' && data.specialization && data.barNumber) {
       await prisma.lawyerProfile.create({
         data: {
@@ -291,7 +291,7 @@ export class AuthService {
       });
     }
 
-    // Send verification email
+    // ارسال ایمیل تایید (اختیاری)
     try {
       await sendEmail(
         data.email,
@@ -303,12 +303,12 @@ export class AuthService {
     }
 
     return {
-      message: 'User registered successfully. Please verify your email.',
+      message: 'User registered successfully.',
       userId: user.id,
     };
   }
 
-  async login(identifier: string, password: string) {
+  async login(identifier: string, _password: string) {
     // Find user by email or phone
     let user = await userRepository.findByEmail(identifier);
     if (!user) {
@@ -319,17 +319,16 @@ export class AuthService {
       throw new Error('Invalid credentials');
     }
 
-    if (!user.isVerified) {
-      throw new Error('Please verify your email first');
-    }
-
-    // ⚠️ موقتاً غیرفعال کنید (برای تست)
-    // const isValid = await bcrypt.compare(password, user.password);
-    // if (!isValid) {
-    //   throw new Error('Invalid credentials');
+    // ❌ حذف بررسی isVerified - دیگر نیازی نیست
+    // if (!user.isVerified) {
+    //   throw new Error('Please verify your email first');
     // }
 
-    console.log('🔓 Password check bypassed for user:', user.email);
+    // Check password
+    const isValid = await bcrypt.compare(_password, user.password);
+    if (!isValid) {
+      throw new Error('Invalid credentials');
+    }
 
     // Generate tokens
     const payload = {
@@ -350,7 +349,7 @@ export class AuthService {
         phone: user.phone,
         fullName: user.fullName,
         role: user.role,
-        isVerified: user.isVerified,
+        isVerified: true, // همیشه true برگردانده می‌شود
       },
     };
   }
@@ -361,8 +360,8 @@ export class AuthService {
       throw new Error('Invalid verification token');
     }
 
+    // کاربر قبلاً تایید شده است، فقط توکن را پاک می‌کنیم
     await userRepository.update(user.id, {
-      isVerified: true,
       verifyToken: null,
     });
 

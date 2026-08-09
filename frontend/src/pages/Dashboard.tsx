@@ -10,11 +10,7 @@ import {
   IoChatbubbleOutline, 
   IoPersonOutline,
   IoArrowBackOutline,
-  IoSparklesOutline,
-  IoCheckmarkCircleOutline,
-  IoShieldCheckmarkOutline
 } from 'react-icons/io5';
-import { MdSecurity } from 'react-icons/md';
 import { HiOutlineUserGroup } from 'react-icons/hi';
 import { RiRobot2Line } from 'react-icons/ri';
 
@@ -30,23 +26,21 @@ const containerVariants = {
   },
 };
 
+// اصلاح itemVariants - ساده‌ترین شکل ممکن
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
+  visible: { 
+    y: 0, 
     opacity: 1,
-    transition: {
-      type: 'spring',
-      stiffness: 300,
-      damping: 24,
-    },
+    transition: { 
+      duration: 0.5
+    }
   },
 };
 
 export const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { conversations, isLoading } = useSelector((state: RootState) => state.chat);
+  const { isLoading } = useSelector((state: RootState) => state.chat);
 
   useEffect(() => {
     dispatch(getConversations({ page: 1, limit: 10 }));
@@ -111,29 +105,18 @@ export const Dashboard: React.FC = () => {
 
         <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
           {/* Avatar / Illustration */}
-          <motion.div 
-            // whileHover={{ scale: 1.05, rotate: -2 }}
-            // transition={{ type: 'spring', stiffness: 400 }}
-            className="flex-shrink-0"
-          >
+          <motion.div className="flex-shrink-0">
             <div className="relative w-48 h-48 lg:w-64 lg:h-64">
-              {/* <div className="absolute inset-0 bg-gradient-to-tr from-[#4A8AB5] to-[#1A4B6D] rounded-2xl blur-2xl opacity-40" /> */}
               <img
                 src="https://images.pexels.com/photos/7781900/pexels-photo-7781900.jpeg"
                 alt="مشاوره حقوقی هوشمند"
                 className="relative w-full h-full object-cover rounded-2xl shadow-2xl border-2 border-white/20"
               />
-              {/* Online Status Badge */}
-              {/* <div className="absolute -bottom-2 -right-2 bg-emerald-500 rounded-full p-1.5 border-2 border-[#0A1A2B]">
-                <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
-              </div> */}
             </div>
           </motion.div>
 
           {/* Content - Improved readability */}
           <div className="flex-1 text-center lg:text-right space-y-5">
-         
-
             {/* Main Title - Larger and bolder for better readability */}
             <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
               به سامانه مشاوره حقوقی
@@ -178,7 +161,6 @@ export const Dashboard: React.FC = () => {
         className="space-y-4"
       >
         <h2 className="text-xl font-bold text-[#0A1A2B] dark:text-white flex items-center gap-3">
-          {/* <IoSparklesOutline className="text-[#4A8AB5] text-2xl" /> */}
           اقدامات سریع
         </h2>
         
@@ -194,7 +176,7 @@ export const Dashboard: React.FC = () => {
               
               <div className="relative z-10 flex items-start gap-4">
                 <div className="p-3 rounded-xl transition-all duration-300">
-                  <action.icon className="w-6 h-6 " />
+                  <action.icon className="w-6 h-6" />
                 </div>
                 
                 <div className="flex-1">
@@ -228,16 +210,13 @@ export const Dashboard: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-[#4A8AB5]/10 to-transparent" />
         
         <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-        
-            <div>
-              <h4 className="font-bold text-white text-lg">
-                مشاوره حقوقی هوشمند و امن
-              </h4>
-              <p className="text-white/80 text-sm">
-                از هوش مصنوعی راشا عدالت برای پاسخ به سوالات حقوقی خود استفاده کنید
-              </p>
-            </div>
+          <div>
+            <h4 className="font-bold text-white text-lg">
+              مشاوره حقوقی هوشمند و امن
+            </h4>
+            <p className="text-white/80 text-sm">
+              از هوش مصنوعی راشا عدالت برای پاسخ به سوالات حقوقی خود استفاده کنید
+            </p>
           </div>
           
           <Link

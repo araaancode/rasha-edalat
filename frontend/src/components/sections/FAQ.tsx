@@ -2,16 +2,12 @@
 import React, { useState } from 'react';
 import { SectionTitle } from '../common/SectionTitle';
 import { 
-  MdHelpOutline, 
   MdKeyboardArrowDown, 
   MdReply, 
-  MdHeadsetMic,
   MdArrowBack
 } from 'react-icons/md';
 import { RiQuestionFill } from 'react-icons/ri';
 import { TbHeadset } from 'react-icons/tb';
-import { HiOutlineQuestionMarkCircle } from 'react-icons/hi';
-import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 
 export const FAQ: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -49,7 +45,6 @@ export const FAQ: React.FC = () => {
 
   return (
     <section className="py-16 sm:py-20 bg-gradient-to-b from-[#F8F9FA] to-white relative overflow-hidden" id="faq">
-      {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-64 h-64 bg-[#1A4B6D]/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#4A8AB5]/5 rounded-full blur-3xl"></div>
       
@@ -71,7 +66,6 @@ export const FAQ: React.FC = () => {
                 data-aos="fade-up"
                 data-aos-delay={index * 80}
               >
-                {/* Question Header - Clickable */}
                 <button
                   onClick={() => toggleQuestion(index)}
                   className="w-full text-right p-5 md:p-6 flex items-start justify-between gap-4 group"
@@ -93,7 +87,6 @@ export const FAQ: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Toggle Icon */}
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
                     openIndex === index 
                       ? 'bg-[#1A4B6D] text-white rotate-180' 
@@ -103,7 +96,6 @@ export const FAQ: React.FC = () => {
                   </div>
                 </button>
 
-                {/* Answer - Expandable */}
                 <div className={`overflow-hidden transition-all duration-300 ${
                   openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                 }`}>
@@ -124,7 +116,6 @@ export const FAQ: React.FC = () => {
             ))}
           </div>
 
-          {/* Bottom CTA */}
           <div className="mt-12 text-center">
             <p className="text-[#4A5A6E] text-sm mb-4">
               سوال دیگری دارید؟ ما آماده پاسخگویی هستیم

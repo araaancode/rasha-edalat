@@ -2,18 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  IoScaleOutline, 
   IoCallOutline, 
   IoMailOutline, 
   IoPaperPlaneOutline,
   IoArrowUpOutline,
-  // IoLogoTelegram,
-  // IoLogoWhatsapp,
-  // IoLogoInstagram,
-  // IoLogoLinkedin
 } from 'react-icons/io5';
-// import { GrTelegram } from 'react-icons/gr';
-// import { TiSocialTelegram } from 'react-icons/ti';
 import { MdCopyright } from 'react-icons/md';
 
 export const Footer: React.FC = () => {
@@ -35,26 +28,16 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="bg-[#0A1A2B] text-white relative overflow-hidden">
-      {/* Decorative Top Border with Gradient */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#1A4B6D] to-transparent"></div>
       
-      {/* Decorative Background Elements */}
       <div className="absolute top-20 right-10 w-64 h-64 bg-[#1A4B6D]/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#4A8AB5]/5 rounded-full blur-3xl"></div>
 
       <div className="relative z-10 pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Main Footer Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-8 text-center sm:text-right">
-            {/* Brand Section */}
             <div className="flex flex-col items-center sm:items-start">
               <div className="flex items-center gap-3 mb-4 group">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-[#1A4B6D] blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-                  <div className="relative w-11 h-11 bg-gradient-to-br from-white to-gray-200 rounded-xl flex items-center justify-center text-[#0A1A2B] text-lg shadow-lg transform transition-all duration-300">
-                    <IoScaleOutline />
-                  </div>
-                </div>
                 <div>
                   <span className="font-bold text-xl tracking-tight">
                     راشا <span className="text-[#4A8AB5]">عدالت</span>
@@ -79,7 +62,6 @@ export const Footer: React.FC = () => {
               </div>
             </div>
 
-            {/* Quick Links */}
             <div>
               <h4 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4 relative inline-block">
                 دسترسی سریع
@@ -105,7 +87,6 @@ export const Footer: React.FC = () => {
               </ul>
             </div>
 
-            {/* Services */}
             <div>
               <h4 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4 relative inline-block">
                 خدمات
@@ -131,32 +112,12 @@ export const Footer: React.FC = () => {
               </ul>
             </div>
 
-            {/* Social & Newsletter */}
             <div>
               <h4 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4 relative inline-block">
                 شبکه‌های اجتماعی
                 <span className="absolute bottom-0 right-0 w-8 h-0.5 bg-[#4A8AB5]"></span>
               </h4>
-              
-              {/* <div className="flex gap-3 justify-center sm:justify-start mb-4">
-                {[
-                  { icon: TiSocialTelegram, color: '#0088cc' },
-                  { icon: IoLogoWhatsapp, color: '#25D366' },
-                  { icon: IoLogoInstagram, color: '#E4405F' },
-                  { icon: IoLogoLinkedin, color: '#0077B5' },
-                ].map((social, index) => (
-                  <a 
-                    key={index}
-                    href="#" 
-                    className="relative group w-11 h-11 border border-white/10 flex items-center justify-center rounded-xl text-white/30 hover:text-white hover:border-white/20 hover:translate-y-[-3px] transition-all duration-300 overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#1A4B6D] to-[#2A6A8D] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <social.icon className="relative z-10 group-hover:scale-110 transition-transform duration-300" />
-                  </a>
-                ))}
-              </div> */}
 
-              {/* Newsletter */}
               <div className="mt-4">
                 <p className="text-white/30 text-xs mb-2">عضویت در خبرنامه</p>
                 <div className="flex gap-2">
@@ -173,7 +134,6 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Bar */}
           <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-white/20 text-xs flex items-center gap-1">
               <MdCopyright /> 

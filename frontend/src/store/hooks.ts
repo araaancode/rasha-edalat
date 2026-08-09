@@ -1,5 +1,6 @@
 // frontend/src/store/hooks.ts
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import type { TypedUseSelectorHook } from 'react-redux';
 import type { RootState, AppDispatch } from './index';
 
 // استفاده از این hooks به جای useDispatch و useSelector مستقیم

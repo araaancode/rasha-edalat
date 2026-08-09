@@ -1,3 +1,4 @@
+// src/config/env.ts
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -18,32 +19,32 @@ export const env = {
   },
 
   jwt: {
-    accessSecret: process.env.JWT_ACCESS_SECRET!,
-    refreshSecret: process.env.JWT_REFRESH_SECRET!,
+    accessSecret: process.env.JWT_ACCESS_SECRET || 'your-access-secret-key-min-32-characters',
+    refreshSecret: process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key-min-32-characters',
     accessExpiry: process.env.JWT_ACCESS_EXPIRY || '15m',
     refreshExpiry: process.env.JWT_REFRESH_EXPIRY || '7d',
   },
 
   encryption: {
-    key: process.env.ENCRYPTION_KEY!,
+    key: process.env.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef',
   },
 
   openai: {
-    apiKey: process.env.OPENAI_API_KEY!,
+    apiKey: process.env.OPENAI_API_KEY || '',
     model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
   },
 
   zarinpal: {
-    merchantId: process.env.ZARINPAL_MERCHANT_ID!,
-    callbackUrl: process.env.ZARINPAL_CALLBACK_URL!,
+    merchantId: process.env.ZARINPAL_MERCHANT_ID || '',
+    callbackUrl: process.env.ZARINPAL_CALLBACK_URL || 'http://localhost:5000/api/payments/verify',
     sandbox: process.env.ZARINPAL_SANDBOX === 'true',
   },
 
   email: {
-    host: process.env.SMTP_HOST!,
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587'),
-    user: process.env.SMTP_USER!,
-    pass: process.env.SMTP_PASS!,
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
   },
 
   file: {
@@ -53,8 +54,8 @@ export const env = {
 
   rateLimit: {
     window: parseInt(process.env.RATE_LIMIT_WINDOW || '60000'),
-    max: parseInt(process.env.RATE_LIMIT_MAX || '100'),
-    maxChat: parseInt(process.env.RATE_LIMIT_MAX_CHAT || '20'),
+    max: parseInt(process.env.RATE_LIMIT_MAX || '1000'),
+    maxChat: parseInt(process.env.RATE_LIMIT_MAX_CHAT || '200'),
   },
 
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
