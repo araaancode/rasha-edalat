@@ -1,330 +1,602 @@
 // frontend/src/components/layout/Header.tsx
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../../store';
 import { logout } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
-// جایگزینی آیکون‌های react-icons/fa با کتابخانه‌های دیگر
-import { 
-  IoLogOutOutline, 
-  IoPersonOutline, 
-  IoChevronDown, 
-  IoCallOutline, 
-  IoMailOutline, 
-  IoTimeOutline, 
-  // IoBalanceScaleOutline, 
-  IoPersonAddOutline, 
-  IoCardOutline 
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  IoLogOutOutline,
+  IoPersonOutline,
+  IoChevronDown,
+  IoCallOutline,
+  IoMailOutline,
+  IoTimeOutline,
+  IoPersonAddOutline,
+  IoCardOutline,
+  IoGridOutline,
+  IoCloseOutline,
+  IoMenuOutline,
+  IoArrowBackOutline,
 } from 'react-icons/io5';
-// برای آیکون Scale می‌توانیم از کتابخانه دیگری هم استفاده کنیم
 import { GiScales } from 'react-icons/gi';
 
+// ============================================
+// Design Tokens
+// ============================================
+const BRAND = {
+  deep: '#0A1A2B',
+  primary: '#1A4B6D',
+  primaryHover: '#2A6A8D',
+  accent: '#4A8AB5',
+} as const;
+
+// ============================================
+// Nav Links
+// ============================================
+const navLinks = [
+  { href: '/', label: 'خانه' },
+  { href: '/#ai-section', label: 'مشاوره هوش مصنوعی' },
+  { href: '/#faq', label: 'سوالات متداول' },
+];
+
+// ============================================
+// Header Props
+// ============================================
 interface HeaderProps {
   scrolled?: boolean;
 }
 
+// ============================================
+// Header Component
+// ============================================
 export const Header: React.FC<HeaderProps> = ({ scrolled: propScrolled }) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  
-  // گرفتن user از Redux
+  const location = useLocation();
+
   const user = useSelector((state: RootState) => state.auth.user);
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(propScrolled || false);
+  const [scrolled, setScrolled] = useState(propScrolled ?? false);
 
-  // دیباگ - چاپ وضعیت کاربر در کنسول
-  useEffect(() => {
-    console.log('🔍 Header Debug:');
-    console.log('  - user:', user);
-    console.log('  - isAuthenticated:', isAuthenticated);
-    console.log('  - token:', localStorage.getItem('accessToken') ? '✅ موجود' : '❌');
-  }, [user, isAuthenticated]);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
+  // ============================================
+  // Scroll Detection
+  // ============================================
   useEffect(() => {
     if (propScrolled !== undefined) {
       setScrolled(propScrolled);
       return;
     }
-
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [propScrolled]);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const closeMenu = () => setIsMenuOpen(false);
-  const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
+  // ============================================
+  // Close menus on route change
+  // ============================================
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsUserMenuOpen(false);
+  }, [location.pathname]);
 
-  const handleLogout = async () => {
+  // ============================================
+  // Close user menu on outside click / Escape
+  // ============================================
+  useEffect(() => {
+    if (!isUserMenuOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target as Node)
+      ) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsUserMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isUserMenuOpen]);
+
+  // ============================================
+  // Lock body scroll when mobile menu open
+  // ============================================
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
+  // ============================================
+  // Logout
+  // ============================================
+  const handleLogout = useCallback(async () => {
     try {
       await dispatch(logout()).unwrap();
       toast.success('خروج موفقیت‌آمیز بود');
       navigate('/login');
-    } catch (error) {
+    } catch {
       toast.error('خطا در خروج از حساب');
     }
-  };
+  }, [dispatch, navigate]);
 
-  const navLinks = [
-    { href: '/', label: 'خانه' },
-    { href: '#ai-section', label: 'مشاوره هوش مصنوعی' },
-    { href: '#faq', label: 'سوالات متداول' },
-  ];
+  const userInitial = user?.fullName?.charAt(0) || 'U';
+  const isHome = location.pathname === '/';
 
   return (
     <>
-      {/* ===== TOP BAR ===== */}
-      <div className="bg-[#0A1A2B] text-white text-sm py-2 border-b border-[#1A4B6D]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm">
-            <span className="flex items-center gap-1 hover:text-[#4A8AB5] transition-colors cursor-pointer">
-              <IoCallOutline className="text-[#4A8AB5] text-xs sm:text-sm" />
-              <span className="hidden sm:inline">۰۲۱-۱۲۳۴-۵۶۷۸</span>
-              <span className="sm:hidden">۰۲۱-۱۲۳۴</span>
-            </span>
-            <span className="flex items-center gap-1 hover:text-[#4A8AB5] transition-colors cursor-pointer">
-              <IoMailOutline className="text-[#4A8AB5] text-xs sm:text-sm" />
-              <span className="hidden sm:inline">info@rasha-adalat.ir</span>
-              <span className="sm:hidden">info@rasha</span>
-            </span>
-            <span className="flex items-center gap-1 hover:text-[#4A8AB5] transition-colors cursor-pointer">
-              <IoTimeOutline className="text-[#4A8AB5] text-xs sm:text-sm" />
-              <span className="hidden md:inline">شنبه - پنجشنبه ۹:۰۰ - ۱۸:۰۰</span>
-              <span className="md:hidden">۹-۱۸</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-xs sm:text-sm">
-            {/* بررسی مستقیم user */}
-            {user ? (
-              <div className="relative">
-                <button 
-                  onClick={toggleUserMenu}
-                  className="flex items-center gap-2 hover:text-[#4A8AB5] transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
-                >
-                  <span className="w-6 h-6 rounded-full bg-gradient-to-br from-[#4A8AB5] to-[#2A6A8D] flex items-center justify-center text-white text-xs font-bold">
-                    {user?.fullName?.charAt(0) || 'U'}
-                  </span>
-                  <span className="hidden sm:inline">{user?.fullName || 'کاربر'}</span>
-                  <IoChevronDown className="text-xs" />
-                </button>
-                
-                {isUserMenuOpen && (
-                  <div className="absolute left-0 mt-2 w-48 bg-[#0A1A2B] border border-[#1A4B6D] rounded-xl shadow-2xl overflow-hidden z-50">
-                    <div className="px-4 py-3 border-b border-white/5">
-                      <p className="text-white text-sm font-medium">{user?.fullName}</p>
-                      <p className="text-white/40 text-xs">{user?.email}</p>
-                    </div>
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300"
-                    >
-                      <IoPersonOutline className="text-sm" />
-                      <span>داشبورد</span>
-                    </Link>
-                    <Link
-                      to="/profile"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300"
-                    >
-                      <IoCardOutline className="text-sm" />
-                      <span>پروفایل</span>
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-3 px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300 w-full text-right border-t border-white/5"
-                    >
-                      <IoLogOutOutline className="text-sm" />
-                      <span>خروج</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
-                <Link to="/login" className="hover:text-[#4A8AB5] transition-colors px-2 py-1 relative group">
-                  ورود
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#4A8AB5] transition-all duration-300 group-hover:w-full"></span>
-                </Link>
-                <Link to="/register" className="bg-[#4A8AB5] text-white px-3 sm:px-4 py-1 rounded-md hover:bg-[#2A6A8D] transition-all duration-300 font-medium text-xs sm:text-sm shadow-lg hover:shadow-xl">
-                  ثبت‌نام
-                </Link>
-              </>
-            )}
+      {/* ============================================
+          Top Info Bar — only on home page
+          ============================================ */}
+      {isHome && (
+        <div
+          className="hidden md:block text-white text-xs border-b border-white/5"
+          style={{ backgroundColor: BRAND.deep }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-9 flex items-center justify-between">
+            <div className="flex items-center gap-6 text-white/60">
+              <a
+                href="tel:02112345678"
+                className="flex items-center gap-1.5 hover:text-white transition-colors"
+              >
+                <IoCallOutline
+                  className="text-sm"
+                  style={{ color: BRAND.accent }}
+                />
+                ۰۲۱-۱۲۳۴-۵۶۷۸
+              </a>
+              <a
+                href="mailto:info@rasha-adalat.ir"
+                className="flex items-center gap-1.5 hover:text-white transition-colors"
+              >
+                <IoMailOutline
+                  className="text-sm"
+                  style={{ color: BRAND.accent }}
+                />
+                info@rasha-adalat.ir
+              </a>
+              <span className="flex items-center gap-1.5">
+                <IoTimeOutline
+                  className="text-sm"
+                  style={{ color: BRAND.accent }}
+                />
+                شنبه تا پنجشنبه ۹:۰۰ - ۱۸:۰۰
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3 text-white/60">
+              {isAuthenticated && user ? (
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  خوش آمدید، {user.fullName}
+                </span>
+              ) : (
+                <span>پشتیبانی ۲۴/۷ در کنار شماست</span>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* ===== MAIN HEADER ===== */}
-      <header 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled 
-            ? 'bg-[#0A1A2B]/95 backdrop-blur-xl shadow-2xl border-b border-white/5' 
-            : 'bg-[#0A1A2B] backdrop-blur-none'
-        }`}
+      {/* ============================================
+          Main Header
+          ============================================ */}
+      <header
+        className={[
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+          scrolled
+            ? 'backdrop-blur-xl shadow-lg shadow-black/5 border-b border-white/5'
+            : 'border-b border-transparent',
+        ].join(' ')}
+        style={{
+          backgroundColor: scrolled
+            ? `${BRAND.deep}F2`
+            : BRAND.deep,
+          marginTop: isHome ? 0 : 0,
+        }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo */}
-            <Link 
-              to={user ? "/dashboard" : "/"} 
-              className="flex items-center gap-3 group flex-shrink-0"
+          <div className="flex items-center justify-between h-16">
+            {/* ============================================
+                Logo
+                ============================================ */}
+            <Link
+              to={user ? '/dashboard' : '/'}
+              className="flex items-center gap-2.5 group flex-shrink-0"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-[#1A4B6D] blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-                <div className="relative w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#1A4B6D] to-[#0A1A2B] rounded-xl flex items-center justify-center text-white text-lg md:text-xl shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-[-5deg]">
-                  <GiScales />
+                <div
+                  className="absolute inset-0 rounded-xl blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-300"
+                  style={{ backgroundColor: BRAND.accent }}
+                />
+                <div
+                  className="relative w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transform transition-transform duration-300 group-hover:scale-105"
+                  style={{
+                    background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.deep} 100%)`,
+                  }}
+                >
+                  <GiScales className="w-5 h-5" />
                 </div>
               </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg md:text-xl text-white tracking-tight">
-                  راشا <span className="text-[#4A8AB5]">عدالت</span>
+              <div className="flex flex-col leading-none">
+                <span className="font-bold text-base text-white tracking-tight">
+                  راشا <span style={{ color: BRAND.accent }}>عدالت</span>
                 </span>
-                <span className="text-[8px] md:text-[10px] text-white/40 tracking-wider uppercase">
+                <span className="text-[9px] text-white/40 tracking-wider uppercase mt-0.5">
                   مشاوره حقوقی هوشمند
                 </span>
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center justify-center flex-1 gap-2 mx-8">
+            {/* ============================================
+                Desktop Navigation
+                ============================================ */}
+            <nav className="hidden md:flex items-center gap-1 flex-1 justify-center mx-6">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="relative px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 rounded-lg hover:bg-white/5 group"
+                  className="relative px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors duration-200 rounded-lg hover:bg-white/5"
                 >
-                  <span className="relative z-10">{link.label}</span>
-                  <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-[#4A8AB5] to-[#6AA8C5] transition-all duration-300 group-hover:w-1/2 group-hover:left-1/4"></span>
-                  <span className="absolute bottom-0 right-1/2 w-0 h-0.5 bg-gradient-to-l from-[#4A8AB5] to-[#6AA8C5] transition-all duration-300 group-hover:w-1/2 group-hover:right-1/4"></span>
-                  <span className="absolute inset-0 bg-[#4A8AB5]/0 rounded-lg transition-all duration-300 group-hover:bg-[#4A8AB5]/5"></span>
+                  {link.label}
                 </a>
               ))}
             </nav>
 
-            {/* Right Actions */}
-            <div className="flex items-center gap-3 flex-shrink-0">
-              {user ? (
-                <div className="hidden md:flex items-center gap-3">
-                  <Link
-                    to="/dashboard"
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#1A4B6D] to-[#2A6A8D] text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-white/10 hover:border-white/20 relative overflow-hidden group"
+            {/* ============================================
+                Desktop Right Actions
+                ============================================ */}
+            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+              {isAuthenticated && user ? (
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setIsUserMenuOpen((v) => !v)}
+                    aria-expanded={isUserMenuOpen}
+                    aria-haspopup="menu"
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-white/5 transition-colors duration-200"
                   >
-                    <IoPersonOutline className="relative z-10 text-sm" />
-                    <span className="relative z-10">داشبورد</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  </Link>
+                    <span
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-md"
+                      style={{
+                        background: `linear-gradient(135deg, ${BRAND.accent} 0%, ${BRAND.primaryHover} 100%)`,
+                      }}
+                    >
+                      {userInitial}
+                    </span>
+                    <span className="text-sm font-medium text-white/90 hidden lg:inline max-w-[120px] truncate">
+                      {user.fullName}
+                    </span>
+                    <IoChevronDown
+                      className={[
+                        'text-xs text-white/50 transition-transform duration-200',
+                        isUserMenuOpen ? 'rotate-180' : '',
+                      ].join(' ')}
+                    />
+                  </button>
+
+                  <AnimatePresence>
+                    {isUserMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                        transition={{ duration: 0.15 }}
+                        role="menu"
+                        className="absolute left-0 mt-2 w-64 rounded-2xl overflow-hidden shadow-2xl border border-white/10 backdrop-blur-xl"
+                        style={{ backgroundColor: `${BRAND.deep}F5` }}
+                      >
+                        {/* User info */}
+                        <div className="px-4 py-3.5 border-b border-white/5">
+                          <div className="flex items-center gap-3">
+                            <span
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-white text-base font-bold shadow-md flex-shrink-0"
+                              style={{
+                                background: `linear-gradient(135deg, ${BRAND.accent} 0%, ${BRAND.primaryHover} 100%)`,
+                              }}
+                            >
+                              {userInitial}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="text-white text-sm font-semibold truncate">
+                                {user.fullName}
+                              </p>
+                              <p className="text-white/40 text-xs truncate">
+                                {user.email}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Menu items */}
+                        <div className="py-1.5">
+                          <Link
+                            to="/dashboard"
+                            role="menuitem"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            <IoGridOutline className="text-base" />
+                            داشبورد
+                          </Link>
+                          <Link
+                            to="/profile"
+                            role="menuitem"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            <IoPersonOutline className="text-base" />
+                            پروفایل
+                          </Link>
+                          <Link
+                            to="/subscription"
+                            role="menuitem"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            <IoCardOutline className="text-base" />
+                            اشتراک من
+                          </Link>
+                        </div>
+
+                        {/* Logout */}
+                        <div className="border-t border-white/5 py-1.5">
+                          <button
+                            onClick={handleLogout}
+                            role="menuitem"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-right"
+                          >
+                            <IoLogOutOutline className="text-base" />
+                            خروج از حساب
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ) : (
-                <Link
-                  to="/register"
-                  className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#1A4B6D] to-[#2A6A8D] text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-white/10 hover:border-white/20 relative overflow-hidden group"
-                >
-                  <IoPersonAddOutline className="relative z-10 text-sm" />
-                  <span className="relative z-10">ثبت‌نام</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                </Link>
-              )}
-              
-              {/* Mobile Menu Button */}
-              <button
-                onClick={toggleMenu}
-                className="md:hidden relative w-10 h-10 flex flex-col items-center justify-center gap-1.5 rounded-lg hover:bg-white/5 transition-all duration-300 group"
-                aria-label="منو"
-              >
-                <span className={`block w-5 h-0.5 bg-white transition-all duration-300 ${
-                  isMenuOpen ? 'rotate-45 translate-y-2' : ''
-                }`}></span>
-                <span className={`block w-5 h-0.5 bg-white transition-all duration-300 ${
-                  isMenuOpen ? 'opacity-0' : ''
-                }`}></span>
-                <span className={`block w-5 h-0.5 bg-white transition-all duration-300 ${
-                  isMenuOpen ? '-rotate-45 -translate-y-2' : ''
-                }`}></span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <div className={`md:hidden fixed top-[72px] left-0 right-0 bg-[#0A1A2B]/95 backdrop-blur-xl border-b border-white/5 transition-all duration-300 overflow-hidden ${
-          isMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-        }`}>
-          <div className="px-4 py-6 space-y-2">
-            {user && (
-              <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-xl mb-4">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4A8AB5] to-[#2A6A8D] flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                  {user?.fullName?.charAt(0) || 'U'}
-                </div>
-                <div>
-                  <p className="text-white font-medium text-sm">{user?.fullName}</p>
-                  <p className="text-white/40 text-xs">{user?.email}</p>
-                </div>
-              </div>
-            )}
-            
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={closeMenu}
-                className="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-300 border-r-2 border-transparent hover:border-[#4A8AB5]"
-              >
-                {link.label}
-              </a>
-            ))}
-            <div className="pt-4 border-t border-white/5">
-              {user ? (
                 <>
                   <Link
-                    to="/dashboard"
-                    onClick={closeMenu}
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-[#1A4B6D] to-[#2A6A8D] text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
+                    to="/login"
+                    className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors rounded-lg hover:bg-white/5"
                   >
-                    <IoPersonOutline />
-                    داشبورد
+                    ورود
                   </Link>
-                  <button
-                    onClick={() => {
-                      closeMenu();
-                      handleLogout();
+                  <Link
+                    to="/register"
+                    className="group relative flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 overflow-hidden"
+                    style={{
+                      background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryHover} 100%)`,
                     }}
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 mt-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-300"
                   >
-                    <IoLogOutOutline />
-                    خروج
-                  </button>
+                    <IoPersonAddOutline className="text-base" />
+                    ثبت‌نام
+                  </Link>
                 </>
-              ) : (
-                <Link
-                  to="/register"
-                  onClick={closeMenu}
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-[#1A4B6D] to-[#2A6A8D] text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
-                >
-                  <IoPersonAddOutline />
-                  ثبت‌نام
-                </Link>
               )}
             </div>
+
+            {/* ============================================
+                Mobile Menu Button
+                ============================================ */}
+            <button
+              onClick={() => setIsMobileMenuOpen((v) => !v)}
+              className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors"
+              aria-label={isMobileMenuOpen ? 'بستن منو' : 'باز کردن منو'}
+              aria-expanded={isMobileMenuOpen}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {isMobileMenuOpen ? (
+                  <motion.span
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <IoCloseOutline className="w-6 h-6 text-white" />
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="open"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <IoMenuOutline className="w-6 h-6 text-white" />
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Spacer */}
-      <div className="h-[104px] md:h-[112px]"></div>
+      {/* ============================================
+          Mobile Drawer
+          ============================================ */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+              aria-hidden
+            />
 
-      {isUserMenuOpen && (
-        <div 
-          className="fixed inset-0 z-40"
-          onClick={() => setIsUserMenuOpen(false)}
-        />
-      )}
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed top-0 right-0 bottom-0 z-50 w-[85%] max-w-sm md:hidden shadow-2xl"
+              style={{ backgroundColor: BRAND.deep }}
+              role="dialog"
+              aria-modal="true"
+            >
+              {/* Drawer header */}
+              <div className="flex items-center justify-between px-5 h-16 border-b border-white/5">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-white shadow-md"
+                    style={{
+                      background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.deep} 100%)`,
+                    }}
+                  >
+                    <GiScales className="w-4 h-4" />
+                  </div>
+                  <span className="font-bold text-white text-sm">
+                    راشا <span style={{ color: BRAND.accent }}>عدالت</span>
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors"
+                  aria-label="بستن"
+                >
+                  <IoCloseOutline className="w-5 h-5 text-white/70" />
+                </button>
+              </div>
+
+              {/* Drawer content */}
+              <div className="flex flex-col h-[calc(100%-4rem)] overflow-y-auto">
+                {/* User card */}
+                {isAuthenticated && user && (
+                  <div className="p-4">
+                    <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10">
+                      <span
+                        className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold shadow-md flex-shrink-0"
+                        style={{
+                          background: `linear-gradient(135deg, ${BRAND.accent} 0%, ${BRAND.primaryHover} 100%)`,
+                        }}
+                      >
+                        {userInitial}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-white font-semibold text-sm truncate">
+                          {user.fullName}
+                        </p>
+                        <p className="text-white/40 text-xs truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Nav links */}
+                <nav className="px-3 py-2 space-y-1">
+                  {navLinks.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-between px-3 py-3 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                    >
+                      <span>{link.label}</span>
+                      <IoArrowBackOutline className="w-4 h-4 text-white/30" />
+                    </a>
+                  ))}
+                </nav>
+
+                {/* Divider */}
+                <div className="mx-4 my-2 border-t border-white/5" />
+
+                {/* User actions */}
+                {isAuthenticated && user ? (
+                  <nav className="px-3 py-2 space-y-1">
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-3 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                    >
+                      <IoGridOutline className="w-5 h-5 text-white/40" />
+                      داشبورد
+                    </Link>
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-3 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                    >
+                      <IoPersonOutline className="w-5 h-5 text-white/40" />
+                      پروفایل
+                    </Link>
+                    <Link
+                      to="/subscription"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-3 text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                    >
+                      <IoCardOutline className="w-5 h-5 text-white/40" />
+                      اشتراک من
+                    </Link>
+                  </nav>
+                ) : null}
+
+                {/* Bottom CTA */}
+                <div className="mt-auto p-4 space-y-2">
+                  {isAuthenticated && user ? (
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors"
+                    >
+                      <IoLogOutOutline className="w-5 h-5" />
+                      خروج از حساب
+                    </button>
+                  ) : (
+                    <>
+                      <Link
+                        to="/register"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-lg transition-transform active:scale-[0.98]"
+                        style={{
+                          background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryHover} 100%)`,
+                        }}
+                      >
+                        <IoPersonAddOutline className="w-5 h-5" />
+                        ثبت‌نام
+                      </Link>
+                      <Link
+                        to="/login"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 bg-white/5 hover:bg-white/10 transition-colors"
+                      >
+                        ورود به حساب
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ============================================
+          Spacer — matches header height
+          ============================================ */}
+      <div className={`${isHome ? 'h-[100px] md:h-[136px]' : 'h-16'}`} />
     </>
   );
 };
